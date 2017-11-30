@@ -80,10 +80,10 @@ def get_event_list(request):
 
 # 添加嘉宾接口
 def add_guest(request):
-    eid = request.POST.get('eid', '')
-    realname = request.POST.get('realname', '')
-    phone = request.POST.get('phone', '')
-    email = request.POST.get('email', '')
+    eid = request.POST.get('eid', '')                   # 关联发布会id
+    realname = request.POST.get('realname', '')         # 姓名
+    phone = request.POST.get('phone', '')               # 手机号
+    email = request.POST.get('email', '')               # 邮箱
 
     if eid == '' or realname == '' or phone == '':
         return JsonResponse({'status': 10021, 'message': 'parameter error!'})
@@ -122,7 +122,7 @@ def add_guest(request):
     timeArray = time.strptime(etime, "%Y-%M-%d %H:%M:%S")
     e_time = int(time.mktime(timeArray))
 
-    now_time = str(time.time)
+    now_time = str(time.time())         # 当前时间
     ntime = now_time.split(".")[0]
     n_time = int(ntime)
 
@@ -135,6 +135,31 @@ def add_guest(request):
         return JsonResponse({'status': 10026, 'message': 'the event gueat phone number repeat'})
 
     return JsonResponse({'status': 200, 'message': 'add guest success'})
+
+# 嘉宾查询接口
+def get_guest_list(request):
+    eid = request.GET.get("eid", "")        # 关联发布会id
+    phone = request.GET.get("phone", "")    # 嘉宾手机号
+
+    if eid == '':
+        return JsonResponse({'status': 10021, 'message': 'eid cannot be empty'})
+    if eid != '' and phone == '':
+        datas = []
+        results = Guest.objects.filter(event_id=id)
+        if results:
+            for r in results:
+                guest = {}
+                guest['realname'] = r.realname
+                guest['phone'] = r.phone
+                guest['sign'] = r.sign
+                datas.append(guest)
+            return JsonResponse({'result': 200, 'message': 'success', 'data': datas})
+        else:
+            return JsonResponse({'result': 10022, 'message': 'query result is empty'})
+
+    if eid != '' and phone != '':
+        
+
 
 
 
